@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mandelbrot Plot - Jason Storm</title>
+<style>
+  :root { --ink:#1c2331; --muted:#5a6473; --line:#e3e7ee; --accent:#3b5bdb; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background:#f6f8fb; color:var(--ink);
+    font-family: -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+  }
+  header {
+    background: linear-gradient(135deg,#243b8f,#3b5bdb 60%,#5c7cfa);
+    color:#fff; padding: 56px 24px 48px; text-align:center;
+  }
+  header h1 { margin:0 0 6px; font-size:2rem; letter-spacing:.3px; }
+  header p { margin:0; opacity:.9; }
+  main { max-width: 940px; margin: 0 auto; padding: 32px 20px 80px; }
+  section {
+    background:#fff; border:1px solid var(--line); border-radius:16px;
+    padding: 28px 28px 32px; margin: 22px 0;
+    box-shadow: 0 1px 2px rgba(16,24,40,.04);
+  }
+  h2 { font-size:1.35rem; margin:0 0 4px; }
+  h2 .tag {
+    display:inline-block; font-size:.72rem; font-weight:700; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--accent); background:#eef1fd;
+    padding:3px 9px; border-radius:999px; margin-right:10px; vertical-align:middle;
+  }
+  h3 { font-size:1.05rem; margin:22px 0 8px; color:var(--ink); }
+  p, li { color:#2b3444; }
+  .muted { color:var(--muted); }
+  figure { margin: 18px 0 8px; text-align:center; }
+  figure img {
+    max-width:100%; border-radius:12px; border:1px solid var(--line); background:#fff;
+  }
+  figcaption { font-size:.86rem; color:var(--muted); margin-top:8px; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  .plates { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+  @media (max-width:640px){ .grid2,.plates{ grid-template-columns:1fr; } }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:22px; }
+  @media (max-width:640px){ .cols{ grid-template-columns:1fr; } }
+  .pro h3 { color:#2f9e44; }
+  .con h3 { color:#e8590c; }
+  ul { margin:8px 0 0 18px; padding:0; }
+  code {
+    background:#f1f3f7; border:1px solid var(--line); border-radius:6px;
+    padding:1px 6px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size:.9em;
+  }
+  pre {
+    background:#0f1729; color:#dbe4ff; padding:16px 18px; border-radius:12px;
+    overflow:auto; font-size:.85rem; line-height:1.5;
+  }
+  footer { text-align:center; color:var(--muted); font-size:.82rem; padding: 12px 20px 40px; }
+  .swatch { display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:middle; margin-right:5px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>The Mandelbrot Plot</h1>
+  <p>Jason Storm &middot; Precalculus &middot; Infinity project</p>
+</header>
+
+<main>
+
+  <section>
+    <h2><span class="tag">Intro</span>What is the Mandelbrot Plot?</h2>
+    <p>
+      The Mandelbrot Plot is a <strong>fractal</strong>: a pattern that repeats, where each part
+      looks similar to the whole. It is built from the formula
+      <code>Z<sub>n+1</sub> = Z<sub>n</sub><sup>2</sup> + C</code>, where <code>C</code> is a constant
+      chosen by the tester and <code>Z</code> is the number being tested. You plug the result back in
+      over and over. The plot records how many times a starting number can be iterated before it
+      "escapes" (grows past a limit, usually 2).
+    </p>
+  </section>
+
+  <section>
+    <h2><span class="tag">Part 1</span>Made by Hand</h2>
+    <p>
+      I created the plot by hand using <code>C = 0</code> for every point. Each grid point is used
+      as the starting <code>Z<sub>0</sub></code>, and I counted the iterations until
+      <code>|Z|</code> exceeded 2. If it never exceeded 2 within 3 iterations, I colored it green
+      (3 or more).
+    </p>
+    <p class="muted">
+      Color key:
+      <span class="swatch" style="background:#e53935"></span>1 iteration (red) &nbsp;
+      <span class="swatch" style="background:#1e88e5"></span>2 iterations (blue) &nbsp;
+      <span class="swatch" style="background:#43a047"></span>3+ iterations (green)
+    </p>
+
+    <div class="grid2">
+      <figure>
+        <img src="images/hand3x3.png" alt="3x3 Mandelbrot plot by hand">
+        <figcaption>3&times;3 plot: 9 points, C = 0</figcaption>
+      </figure>
+      <figure>
+        <img src="images/hand9x9.png" alt="9x9 Mandelbrot plot by hand">
+        <figcaption>9&times;9 plot: 81 points, C = 0 (higher resolution)</figcaption>
+      </figure>
+    </div>
+
+    <h3>How I did it by hand</h3>
+    <p>
+      For each point I set <code>C = 0</code> and used the point itself as <code>Z<sub>0</sub></code>.
+      Then I repeated <code>Z<sub>n+1</sub> = Z<sub>n</sub><sup>2</sup></code>: square the number,
+      check its distance from the origin, and count. The corners escaped quickly (blue), while the
+      middle points stayed small forever (green). Going from 3&times;3 to 9&times;9 adds more points,
+      which raises the resolution and makes the shape clearer.
+    </p>
+  </section>
+
+  <section>
+    <h2><span class="tag">Part 2</span>Made with Java</h2>
+    <p>
+      The same plot is far easier to make with a computer. I used a Java applet that loops over
+      every pixel, runs the same formula, and colors the pixel based on how many iterations it
+      survived. Below are plots I generated with different <code>r</code> (escape limit) and
+      <code>counter</code> (maximum iterations) values.
+    </p>
+
+    <h3>The loop that draws it</h3>
+    <pre>while (r &lt; 2 &amp;&amp; counter &lt; 1000)
+{
+    counter++;
+    temp = real;
+    real = real*real - imag*imag + xx;
+    imag = 2*temp*imag + yy;
+    r = Math.sqrt(real*real + imag*imag);
+}</pre>
+
+    <div class="plates">
+      <figure><img src="images/r2_c10.png" alt="r=2 counter=10"><figcaption>r = 2, counter = 10</figcaption></figure>
+      <figure><img src="images/r2_c15.png" alt="r=2 counter=15"><figcaption>r = 2, counter = 15</figcaption></figure>
+      <figure><img src="images/r2_c20.png" alt="r=2 counter=20"><figcaption>r = 2, counter = 20</figcaption></figure>
+      <figure><img src="images/r2_c50.png" alt="r=2 counter=50"><figcaption>r = 2, counter = 50</figcaption></figure>
+      <figure><img src="images/r5_c10.png" alt="r=5 counter=10"><figcaption>r = 5, counter = 10</figcaption></figure>
+      <figure><img src="images/r6_c10.png" alt="r=6 counter=10"><figcaption>r = 6, counter = 10</figcaption></figure>
+      <figure><img src="images/r10_c10.png" alt="r=10 counter=10"><figcaption>r = 10, counter = 10</figcaption></figure>
+      <figure><img src="images/r3_c25.png" alt="r=3 counter=25"><figcaption>r = 3, counter = 25 (extra choice)</figcaption></figure>
+      <figure><img src="images/r4_c40.png" alt="r=4 counter=40"><figcaption>r = 4, counter = 40 (extra choice)</figcaption></figure>
+    </div>
+
+    <h3>How I did it with Java</h3>
+    <p>
+      I put the source code into a Java compiler (browxy.com) and pressed run. The program walks
+      through each pixel of the display window, converts the pixel into a complex number, and
+      loops the Mandelbrot formula. The variable <code>r</code> is the escape limit and
+      <code>counter</code> is the maximum number of iterations. Higher <code>counter</code> values
+      give sharper detail; different <code>r</code> values change how quickly points are said to
+      escape. I changed those values and took a screenshot of each result.
+    </p>
+  </section>
+
+  <section>
+    <h2><span class="tag">Part 3</span>Advantages &amp; Challenges of Java</h2>
+    <div class="cols">
+      <div class="pro">
+        <h3>Advantages</h3>
+        <ul>
+          <li>Very fast: it does thousands of calculations per second.</li>
+          <li>Far more accurate and detailed than doing it by hand.</li>
+          <li>Easy to change the picture by editing numbers (limit, iterations, colors).</li>
+          <li>You can zoom into any region instantly.</li>
+          <li>Colors are chosen automatically by the code, no coloring by hand.</li>
+        </ul>
+      </div>
+      <div class="con">
+        <h3>Challenges</h3>
+        <ul>
+          <li>Setting up the applet can be hard; browsers often block Java applets now.</li>
+          <li>Small errors like a missing <code>;</code> or <code>)</code> stop it from compiling.</li>
+          <li>You have to keep the display size and the <code>400.0</code> scaling value matching.</li>
+          <li>The code is not obvious to read if you have not programmed before.</li>
+          <li>You need the right tools installed before it will even run.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Mandelbrot Plot project &middot; by Jason Storm &middot; built as a static page for GitHub Pages.
+  </footer>
+
+</main>
+</body>
+</html>
